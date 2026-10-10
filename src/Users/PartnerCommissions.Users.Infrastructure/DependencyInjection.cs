@@ -18,6 +18,8 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        services.AddHealthChecks().AddDbContextCheck<UsersDbContext>(tags: ["ready"]);
+
         return services;
     }
 }
