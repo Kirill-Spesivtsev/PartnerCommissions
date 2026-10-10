@@ -16,6 +16,7 @@ public static class DependencyInjection
         services.AddDbContext<UsersDbContext>(options => options.UseNpgsql(connectionString));
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

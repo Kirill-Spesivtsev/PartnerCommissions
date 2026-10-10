@@ -9,17 +9,11 @@ namespace PartnerCommissions.Users.Infrastructure.Persistence.Repositories;
 
 public class UserRepository(UsersDbContext db) : IUserRepository
 {
-    public async Task<UserDetails> GetDetailsAsync(string externalId, CancellationToken cancellationToken)
+    public async Task<User> GetByIdAsync(string externalId, CancellationToken cancellationToken)
     {
         var user = await db.Users
-            .AsNoTracking()
-            .Where(u => u.ExternalId == externalId)
-            .Select(u => new UserDetails(
-                u.ExternalId,
-                u.Referrer != null ? u.Referrer.ExternalId : null,
-                u.CreatedAt,
-                u.ReferrerSetAt))
-            .SingleOrDefaultAsync(cancellationToken);
+            .Include(u => u.Referrer)
+            .SingleOrDefaultAsync(u => u.ExternalId == externalId, cancellationToken);
 
         if (user is null)
             throw new NotFoundException($"User '{externalId}' was not found.");

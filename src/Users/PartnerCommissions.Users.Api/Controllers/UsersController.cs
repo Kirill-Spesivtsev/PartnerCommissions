@@ -35,4 +35,12 @@ public class UsersController(UserService userService) : ControllerBase
     {
         return Ok(await userService.GetDescendantsAsync(externalId, maxDepth, cancellationToken));
     }
+
+    [HttpPut("{externalId}/referrer")]
+    public async Task<IActionResult> SetReferrer(string externalId, SetReferrerRequest request, CancellationToken cancellationToken)
+    {
+        await userService.SetReferrerAsync(externalId, request.ReferrerExternalId, cancellationToken);
+
+        return NoContent();
+    }
 }
