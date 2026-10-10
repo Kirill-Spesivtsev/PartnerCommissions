@@ -1,20 +1,30 @@
 services:
-  postgres:
+  users-db:
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=50"]
+      POSTGRES_DB: users_db
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - users-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d users_db"]
       interval: 5s
       timeout: 3s
       retries: 10
-    mem_limit: 256m
+
+  pgadmin:
+    image: dpage/pgadmin4:9.17
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 
 volumes:
-  postgres-data:
+  users-db-data:
+  pgadmin-data:
