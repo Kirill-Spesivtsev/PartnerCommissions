@@ -6,6 +6,7 @@ public class Commission
 {
     public Guid Id { get; set; }
     public Guid EventId { get; set; }
+    public ProfitEvent Event { get; set; } = null!;
 
     public required string PartnerExternalId { get; set; }
     public int Level { get; set; }
