@@ -34,4 +34,29 @@ public class UserRepository(UsersDbContext db) : IUserRepository
             return false;
         }
     }
+
+    public async Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken)
+    {
+        return await db.Database
+            .SqlQuery<string>(
+            $"""
+                WITH RECURSIVE ancestors AS (
+                    SELECT r."ExternalId", r."ReferrerId", 1 AS "Level"
+                    FROM "Users" u
+                    JOIN "Users" r ON r."Id" = u."ReferrerId"
+                    WHERE u."ExternalId" = {externalId}
+
+                    UNION ALL
+
+                    SELECT r."ExternalId", r."ReferrerId", a."Level" + 1
+                    FROM ancestors a
+                    JOIN "Users" r ON r."Id" = a."ReferrerId"
+                    WHERE a."Level" < 9
+                )
+                SELECT "ExternalId" AS "Value"
+                FROM ancestors
+                ORDER BY "Level"
+            """)
+            .ToListAsync(cancellationToken);
+    }
 }

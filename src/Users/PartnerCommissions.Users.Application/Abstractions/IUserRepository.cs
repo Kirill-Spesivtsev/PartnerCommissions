@@ -7,4 +7,5 @@ public interface IUserRepository
 {
     Task<UserDetails?> GetDetailsAsync(string externalId, CancellationToken cancellationToken);
     Task<bool> TryAddAsync(User user, CancellationToken cancellationToken);
+    Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken);
 }
