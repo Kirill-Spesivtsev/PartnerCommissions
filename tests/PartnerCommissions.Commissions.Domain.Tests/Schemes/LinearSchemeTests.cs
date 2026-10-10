@@ -20,7 +20,7 @@ public class LinearSchemeTests
     {
         var ancestors = Ancestors(level);
 
-        var commissions = _scheme.Calculate(100m, ancestors);
+        var commissions = _scheme.Calculate(TestEvents.WithProfit(100m), ancestors);
 
         Assert.Equal(expectedAmount, commissions[level - 1].Amount);
     }
@@ -28,7 +28,7 @@ public class LinearSchemeTests
     [Fact]
     public void Calculate_FullChainOfNine_PaysFortyFivePercentInTotal()
     {
-        var commissions = _scheme.Calculate(1000m, Ancestors(9));
+        var commissions = _scheme.Calculate(TestEvents.WithProfit(1000m), Ancestors(9));
 
         Assert.Equal(9, commissions.Count);
         Assert.Equal(450m, commissions.Sum(c => c.Amount));
@@ -37,7 +37,7 @@ public class LinearSchemeTests
     [Fact]
     public void Calculate_SetsLinearSchemaTypeOnEveryCommission()
     {
-        var commissions = _scheme.Calculate(100m, Ancestors(9));
+        var commissions = _scheme.Calculate(TestEvents.WithProfit(100m), Ancestors(9));
 
         Assert.All(commissions, c => Assert.Equal(SchemaType.Linear, c.SchemaType));
     }

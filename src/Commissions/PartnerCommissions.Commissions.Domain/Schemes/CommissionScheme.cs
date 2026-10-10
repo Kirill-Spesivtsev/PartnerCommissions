@@ -8,9 +8,9 @@ public abstract class CommissionScheme
 
     public abstract SchemaType Type { get; }
 
-    public IReadOnlyList<Commission> Calculate(decimal profit, IReadOnlyList<string> ancestors)
+    public IReadOnlyList<Commission> Calculate(ProfitEvent profitEvent, IReadOnlyList<string> ancestors)
     {
-        if (profit <= 0)
+        if (profitEvent.Profit <= 0)
             return [];
 
         return ancestors
@@ -20,10 +20,13 @@ public abstract class CommissionScheme
                 var level = index + 1;
                 return new Commission
                 {
+                    Id = Guid.NewGuid(),
+                    EventId = profitEvent.Id,
                     PartnerExternalId = partner,
                     Level = level,
                     SchemaType = Type,
-                    Amount = GetPercent(level) * profit / 100m
+                    Amount = GetPercent(level) * profitEvent.Profit / 100m,
+                    AccruedAt = profitEvent.ReceivedAt
                 };
             })
             .ToList();
