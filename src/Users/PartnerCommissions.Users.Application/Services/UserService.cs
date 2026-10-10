@@ -44,6 +44,8 @@ public class UserService(IUserRepository users, IUnitOfWork unitOfWork)
 
     public async Task SetReferrerAsync(string externalId, string referrerExternalId, CancellationToken cancellationToken)
     {
+        await unitOfWork.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
         var user = await users.GetByIdAsync(externalId, cancellationToken);
         var referrer = await users.GetByIdAsync(referrerExternalId, cancellationToken);
 
@@ -52,7 +54,7 @@ public class UserService(IUserRepository users, IUnitOfWork unitOfWork)
         user.ReferrerId = referrer.Id;
         user.ReferrerSetAt = DateTimeOffset.UtcNow;
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 
     private async Task EnsureCanAttachAsync(User user, User referrer, CancellationToken cancellationToken)
