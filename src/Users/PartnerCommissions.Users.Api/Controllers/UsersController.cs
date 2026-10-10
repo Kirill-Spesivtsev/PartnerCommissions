@@ -8,6 +8,7 @@ namespace PartnerCommissions.Users.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/users")]
+[Produces("application/json")]
 public class UsersController(UserService userService) : ControllerBase
 {
     [HttpPost]

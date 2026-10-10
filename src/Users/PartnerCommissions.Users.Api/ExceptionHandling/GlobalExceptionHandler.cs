@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.WebUtilities;
 using PartnerCommissions.Users.Application.Exceptions;
 
 namespace PartnerCommissions.Users.Api.ExceptionHandling;
@@ -19,11 +20,21 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
 
         httpContext.Response.StatusCode = statusCode.Value;
 
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        var context = new ProblemDetailsContext
         {
             HttpContext = httpContext,
             Exception = exception,
-            ProblemDetails = { Detail = exception.Message }
-        });
+            ProblemDetails =
+            {
+                Status = statusCode,
+                Title = ReasonPhrases.GetReasonPhrase(statusCode.Value),
+                Detail = exception.Message
+            }
+        };
+
+        if (!await problemDetailsService.TryWriteAsync(context))
+            await httpContext.Response.WriteAsJsonAsync(context.ProblemDetails, options: null, contentType: "application/problem+json", cancellationToken);
+
+        return true;
     }
 }
