@@ -1,4 +1,24 @@
 services:
+  users-api:
+    build:
+      context: .
+      dockerfile: src/Users/PartnerCommissions.Users.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__UsersDb: Host=users-db;Port=5432;Database=users_db;Username=postgres;Password=postgres
+    ports:
+      - "5001:8080"
+    depends_on:
+      users-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    stop_grace_period: 30s
+
   users-db:
     image: postgres:17-alpine
     environment:
