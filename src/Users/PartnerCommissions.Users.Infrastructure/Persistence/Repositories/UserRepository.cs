@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PartnerCommissions.Users.Application.Abstractions;
+using PartnerCommissions.Users.Application.Exceptions;
 using PartnerCommissions.Users.Application.Models;
 using PartnerCommissions.Users.Domain.Entities;
 
@@ -8,9 +9,9 @@ namespace PartnerCommissions.Users.Infrastructure.Persistence.Repositories;
 
 public class UserRepository(UsersDbContext db) : IUserRepository
 {
-    public Task<UserDetails?> GetDetailsAsync(string externalId, CancellationToken cancellationToken)
+    public async Task<UserDetails> GetDetailsAsync(string externalId, CancellationToken cancellationToken)
     {
-        return db.Users
+        var user = await db.Users
             .AsNoTracking()
             .Where(u => u.ExternalId == externalId)
             .Select(u => new UserDetails(
@@ -19,6 +20,11 @@ public class UserRepository(UsersDbContext db) : IUserRepository
                 u.CreatedAt,
                 u.ReferrerSetAt))
             .SingleOrDefaultAsync(cancellationToken);
+
+        if (user is null)
+            throw new NotFoundException($"User '{externalId}' was not found.");
+
+        return user;
     }
 
     public async Task<bool> TryAddAsync(User user, CancellationToken cancellationToken)
@@ -37,13 +43,12 @@ public class UserRepository(UsersDbContext db) : IUserRepository
 
     public async Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken)
     {
-        return await db.Database
+        var chain = await db.Database
             .SqlQuery<string>(
             $"""
                 WITH RECURSIVE ancestors AS (
-                    SELECT r."ExternalId", r."ReferrerId", 1 AS "Level"
+                    SELECT u."ExternalId", u."ReferrerId", 0 AS "Level"
                     FROM "Users" u
-                    JOIN "Users" r ON r."Id" = u."ReferrerId"
                     WHERE u."ExternalId" = {externalId}
 
                     UNION ALL
@@ -58,9 +63,14 @@ public class UserRepository(UsersDbContext db) : IUserRepository
                 ORDER BY "Level"
             """)
             .ToListAsync(cancellationToken);
+
+        if (chain.Count == 0)
+            throw new NotFoundException($"User '{externalId}' was not found.");
+
+        return chain.Skip(1).ToList();
     }
 
-    public async Task<ReferralTreeNode?> GetDescendantsAsync(string externalId, int maxDepth, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<ReferralTreeNode>> GetDescendantsAsync(string externalId, int maxDepth, CancellationToken cancellationToken)
     {
         var rows = await db.Database
             .SqlQuery<DescendantRow>(
@@ -85,14 +95,14 @@ public class UserRepository(UsersDbContext db) : IUserRepository
         var root = rows.SingleOrDefault(r => r.Depth == 0);
 
         if (root is null)
-            return null;
+            throw new NotFoundException($"User '{externalId}' was not found.");
 
         var children = rows.ToLookup(r => (r.ReferrerId, r.Depth));
 
         ReferralTreeNode Build(DescendantRow row) =>
             new(row.ExternalId, children[(row.Id, row.Depth + 1)].Select(Build).ToList());
 
-        return Build(root);
+        return children[(root.Id, 1)].Select(Build).ToList();
     }
 
     private class DescendantRow

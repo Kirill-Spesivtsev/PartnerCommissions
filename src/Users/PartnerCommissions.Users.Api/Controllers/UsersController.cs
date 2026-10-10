@@ -31,8 +31,8 @@ public class UsersController(UserService userService) : ControllerBase
     }
 
     [HttpGet("{externalId}/tree/down")]
-    public async Task<ActionResult<ReferralTreeNode>> GetDescendants(string externalId, CancellationToken cancellationToken, [FromQuery, Range(1, 9)] int maxDepth = 9)
+    public async Task<ActionResult<IReadOnlyList<ReferralTreeNode>>> GetDescendants(string externalId, CancellationToken cancellationToken, [FromQuery, Range(1, 9)] int maxDepth = 9)
     {
-        return await userService.GetDescendantsAsync(externalId, maxDepth, cancellationToken);
+        return Ok(await userService.GetDescendantsAsync(externalId, maxDepth, cancellationToken));
     }
 }

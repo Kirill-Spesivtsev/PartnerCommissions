@@ -22,33 +22,18 @@ public class UserService(IUserRepository users)
         return new UserDetails(user.ExternalId, null, user.CreatedAt, null);
     }
 
-    public async Task<UserDetails> GetByIdAsync(string externalId, CancellationToken cancellationToken)
+    public Task<UserDetails> GetByIdAsync(string externalId, CancellationToken cancellationToken)
     {
-        var user = await users.GetDetailsAsync(externalId, cancellationToken);
-
-        if (user is null)
-            throw new NotFoundException($"User '{externalId}' not found.");
-
-        return user;
+        return users.GetDetailsAsync(externalId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken)
     {
-        var ancestors = await users.GetAncestorsAsync(externalId, cancellationToken);
-
-        if (ancestors.Count == 0 && await users.GetDetailsAsync(externalId, cancellationToken) is null)
-            throw new NotFoundException($"User '{externalId}' was not found.");
-
-        return ancestors;
+        return users.GetAncestorsAsync(externalId, cancellationToken);
     }
 
-    public async Task<ReferralTreeNode> GetDescendantsAsync(string externalId, int maxDepth, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<ReferralTreeNode>> GetDescendantsAsync(string externalId, int maxDepth, CancellationToken cancellationToken)
     {
-        var tree = await users.GetDescendantsAsync(externalId, maxDepth, cancellationToken);
-
-        if (tree is null)
-            throw new NotFoundException($"User '{externalId}' was not found.");
-
-        return tree;
+        return users.GetDescendantsAsync(externalId, maxDepth, cancellationToken);
     }
 }
