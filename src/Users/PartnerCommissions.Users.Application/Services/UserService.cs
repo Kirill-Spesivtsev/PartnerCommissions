@@ -41,4 +41,14 @@ public class UserService(IUserRepository users)
 
         return ancestors;
     }
+
+    public async Task<ReferralTreeNode> GetDescendantsAsync(string externalId, int maxDepth, CancellationToken cancellationToken)
+    {
+        var tree = await users.GetDescendantsAsync(externalId, maxDepth, cancellationToken);
+
+        if (tree is null)
+            throw new NotFoundException($"User '{externalId}' was not found.");
+
+        return tree;
+    }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using PartnerCommissions.Users.Api.Models;
 using PartnerCommissions.Users.Application.Models;
@@ -27,5 +28,11 @@ public class UsersController(UserService userService) : ControllerBase
     public async Task<ActionResult<IReadOnlyList<string>>> GetAncestors(string externalId, CancellationToken cancellationToken)
     {
         return Ok(await userService.GetAncestorsAsync(externalId, cancellationToken));
+    }
+
+    [HttpGet("{externalId}/tree/down")]
+    public async Task<ActionResult<ReferralTreeNode>> GetDescendants(string externalId, CancellationToken cancellationToken, [FromQuery, Range(1, 9)] int maxDepth = 9)
+    {
+        return await userService.GetDescendantsAsync(externalId, maxDepth, cancellationToken);
     }
 }
