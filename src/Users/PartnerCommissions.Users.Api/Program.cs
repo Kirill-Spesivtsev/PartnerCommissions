@@ -2,8 +2,16 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using PartnerCommissions.Users.Api.ExceptionHandling;
 using PartnerCommissions.Users.Application;
 using PartnerCommissions.Users.Infrastructure;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Service", "users-api")
+    .WriteTo.Console());
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -18,6 +26,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 await app.Services.ApplyMigrationsAsync();
+
+app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler();
 
