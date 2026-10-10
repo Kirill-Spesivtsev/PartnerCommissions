@@ -31,4 +31,14 @@ public class UserService(IUserRepository users)
 
         return user;
     }
+
+    public async Task<IReadOnlyList<string>> GetAncestorsAsync(string externalId, CancellationToken cancellationToken)
+    {
+        var ancestors = await users.GetAncestorsAsync(externalId, cancellationToken);
+
+        if (ancestors.Count == 0 && await users.GetDetailsAsync(externalId, cancellationToken) is null)
+            throw new NotFoundException($"User '{externalId}' was not found.");
+
+        return ancestors;
+    }
 }

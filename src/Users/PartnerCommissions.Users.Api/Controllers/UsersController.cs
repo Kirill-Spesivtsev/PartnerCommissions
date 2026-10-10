@@ -22,4 +22,10 @@ public class UsersController(UserService userService) : ControllerBase
     {
         return await userService.GetByIdAsync(externalId, cancellationToken);
     }
+
+    [HttpGet("{externalId}/tree/up")]
+    public async Task<ActionResult<IReadOnlyList<string>>> GetAncestors(string externalId, CancellationToken cancellationToken)
+    {
+        return Ok(await userService.GetAncestorsAsync(externalId, cancellationToken));
+    }
 }
