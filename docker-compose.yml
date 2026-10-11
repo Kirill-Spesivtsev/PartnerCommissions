@@ -39,6 +39,26 @@ services:
       start_period: 10s
     stop_grace_period: 30s
 
+  wallets-api:
+    build:
+      context: .
+      dockerfile: src/Wallets/PartnerCommissions.Wallets.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__WalletsDb: Host=wallets-db;Port=5432;Database=wallets_db;Username=postgres;Password=postgres
+    ports:
+      - "5003:8080"
+    depends_on:
+      wallets-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health/live"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    stop_grace_period: 30s
+
   users-db:
     image: postgres:17-alpine
     environment:
