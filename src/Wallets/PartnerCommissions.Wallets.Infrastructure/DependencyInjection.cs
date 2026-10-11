@@ -20,6 +20,8 @@ public static class DependencyInjection
 
         services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
 
+        services.AddHealthChecks().AddDbContextCheck<WalletsDbContext>(tags: ["ready"]);
+
         services.Configure<PayoutOptions>(configuration.GetSection(PayoutOptions.SectionName));
         services.AddHostedService<PayoutWorker>();
 
