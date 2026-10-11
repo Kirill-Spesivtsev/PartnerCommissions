@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PartnerCommissions.Wallets.Application.Abstractions;
 using PartnerCommissions.Wallets.Infrastructure.Clients;
+using PartnerCommissions.Wallets.Infrastructure.BackgroundServices;
 using PartnerCommissions.Wallets.Infrastructure.Persistence;
+using PartnerCommissions.Wallets.Infrastructure.Persistence.Repositories;
 
 namespace PartnerCommissions.Wallets.Infrastructure;
 
@@ -15,6 +17,11 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("WalletsDb");
 
         services.AddDbContext<WalletsDbContext>(options => options.UseNpgsql(connectionString));
+
+        services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+
+        services.Configure<PayoutOptions>(configuration.GetSection(PayoutOptions.SectionName));
+        services.AddHostedService<PayoutWorker>();
 
         services.Configure<CommissionsApiOptions>(configuration.GetSection(CommissionsApiOptions.SectionName));
 
