@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddSingleton<CommissionScheme, FibonacciScheme>();
 
         services.AddScoped<EventService>();
+        services.AddScoped<SchemeService>();
 
         return services;
     }
