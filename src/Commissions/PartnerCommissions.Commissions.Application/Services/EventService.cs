@@ -12,11 +12,7 @@ public class EventService(
     IUsersClient usersClient,
     IEnumerable<CommissionScheme> commissionSchemes)
 {
-    public async Task<(EventDetails Event, bool Created)> CreateAsync(
-        string externalId,
-        string userExternalId,
-        decimal profit,
-        CancellationToken cancellationToken)
+    public async Task<(EventDetails Event, bool Created)> CreateAsync(string externalId, string userExternalId, decimal profit, CancellationToken cancellationToken)
     {
         var ancestors = await usersClient.GetAncestorsAsync(userExternalId, cancellationToken);
         var settings = await schemes.GetCurrentAsync(cancellationToken);
@@ -49,6 +45,15 @@ public class EventService(
         var profitEvent = await events.GetByIdAsync(externalId, cancellationToken);
 
         return ToEventDetails(profitEvent);
+    }
+
+    public async Task<IReadOnlyList<EventSummary>> ListByUserAsync(string userExternalId, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var profitEvents = await events.ListByUserAsync(userExternalId, page, pageSize, cancellationToken);
+
+        return profitEvents
+            .Select(e => new EventSummary(e.ExternalId, e.UserExternalId, e.Profit, e.ReceivedAt))
+            .ToList();
     }
 
     private static EventDetails ToEventDetails(ProfitEvent profitEvent)

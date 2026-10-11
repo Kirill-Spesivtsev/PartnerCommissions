@@ -35,4 +35,15 @@ public class EventRepository(CommissionsDbContext db) : IEventRepository
             return false;
         }
     }
+
+    public async Task<IReadOnlyList<ProfitEvent>> ListByUserAsync(string userExternalId, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        return await db.ProfitEvents
+            .AsNoTracking()
+            .Where(e => e.UserExternalId == userExternalId)
+            .OrderByDescending(e => e.ReceivedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }
