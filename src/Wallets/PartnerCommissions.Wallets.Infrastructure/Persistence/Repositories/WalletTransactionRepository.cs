@@ -21,4 +21,23 @@ public class WalletTransactionRepository(WalletsDbContext db) : IWalletTransacti
         db.WalletTransactions.AddRange(transactions);
         await db.SaveChangesAsync(cancellationToken);
     }
+
+    public Task<decimal> GetBalanceAsync(string userExternalId, CancellationToken cancellationToken)
+    {
+        return db.WalletTransactions
+            .Where(t => t.UserExternalId == userExternalId)
+            .SumAsync(t => t.Amount, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<WalletTransaction>> ListByUserAsync(string userExternalId, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        return await db.WalletTransactions
+            .AsNoTracking()
+            .Where(t => t.UserExternalId == userExternalId)
+            .OrderByDescending(t => t.PaidAt)
+            .ThenBy(t => t.CommissionId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+    }
 }
