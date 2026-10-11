@@ -29,7 +29,7 @@ public class UserRepository(UsersDbContext db) : IUserRepository
             await db.SaveChangesAsync(cancellationToken);
             return true;
         }
-        catch
+        catch (DbUpdateException)
         {
             return false;
         }

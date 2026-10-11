@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using PartnerCommissions.Commissions.Application.Abstractions;
 using PartnerCommissions.Commissions.Infrastructure.Clients;
 using PartnerCommissions.Commissions.Infrastructure.Persistence;
+using PartnerCommissions.Commissions.Infrastructure.Persistence.Repositories;
 
 namespace PartnerCommissions.Commissions.Infrastructure;
 
@@ -15,6 +16,9 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("CommissionsDb");
 
         services.AddDbContext<CommissionsDbContext>(options => options.UseNpgsql(connectionString));
+
+        services.AddScoped<IEventRepository, EventRepository>();
+        services.AddScoped<ISchemeRepository, SchemeRepository>();
 
         services.Configure<UsersApiOptions>(configuration.GetSection(UsersApiOptions.SectionName));
 
