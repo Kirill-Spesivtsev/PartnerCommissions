@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<ISchemeRepository, SchemeRepository>();
 
+        services.AddHealthChecks().AddDbContextCheck<CommissionsDbContext>(tags: ["ready"]);
+
         services.Configure<UsersApiOptions>(configuration.GetSection(UsersApiOptions.SectionName));
 
         services.AddHttpClient<IUsersClient, UsersClient>((serviceProvider, client) =>
