@@ -19,6 +19,7 @@ public static class DependencyInjection
 
         services.AddScoped<IEventRepository, EventRepository>();
         services.AddScoped<ISchemeRepository, SchemeRepository>();
+        services.AddScoped<ICommissionRepository, CommissionRepository>();
 
         services.AddHealthChecks().AddDbContextCheck<CommissionsDbContext>(tags: ["ready"]);
 

@@ -13,6 +13,7 @@ public static class DependencyInjection
 
         services.AddScoped<EventService>();
         services.AddScoped<SchemeService>();
+        services.AddScoped<CommissionService>();
 
         return services;
     }
