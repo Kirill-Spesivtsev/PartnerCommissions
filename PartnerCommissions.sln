@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartnerCommissions.Wallets.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PartnerCommissions.Wallets.Api", "src\Wallets\PartnerCommissions.Wallets.Api\PartnerCommissions.Wallets.Api.csproj", "{38B25D5C-6DDD-4B25-85F1-142895BB2B5F}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -205,6 +207,12 @@ Global
 		{38B25D5C-6DDD-4B25-85F1-142895BB2B5F}.Release|x64.Build.0 = Release|Any CPU
 		{38B25D5C-6DDD-4B25-85F1-142895BB2B5F}.Release|x86.ActiveCfg = Release|Any CPU
 		{38B25D5C-6DDD-4B25-85F1-142895BB2B5F}.Release|x86.Build.0 = Release|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Release|x64.ActiveCfg = Release|Any CPU
+		{F8DB17CA-4D3B-423A-BEFD-51FDE084E7ED}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
